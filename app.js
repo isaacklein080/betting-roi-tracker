@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // ===== DOM ELEMENTS =====
   const calendarEl = document.getElementById("calendar");
   const monthLabel = document.getElementById("monthLabel");
   const selectedDateLabel = document.getElementById("selectedDateLabel");
@@ -31,6 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const monthlySummaryEl = document.getElementById("monthlySummary");
   const weeklySummaryEl = document.getElementById("weeklySummary");
+  const weeklyComparisonEl = document.getElementById("weeklyComparison");
   const streakSummaryEl = document.getElementById("streakSummary");
   const categoryBreakdownEl = document.getElementById("categoryBreakdown");
 
@@ -41,13 +43,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const saveBankrollBtn = document.getElementById("saveBankroll");
   const bankrollSummaryEl = document.getElementById("bankrollSummary");
 
+  // ===== STATE =====
   let bets = JSON.parse(localStorage.getItem("bets_v3")) || [];
   let notes = JSON.parse(localStorage.getItem("notes_v1")) || {};
   let bankroll = JSON.parse(localStorage.getItem("bankroll_v1")) || { starting: 0 };
 
-  let currentYear;
-  let currentMonth;
-  let selectedDate = null;
+  const today = new Date();
+  let currentYear = today.getFullYear();
+  let currentMonth = today.getMonth();
+  let selectedDate = formatDate(today);
+
+  selectedDateLabel.textContent = `Bets for ${selectedDate}`;
+  startingBankrollInput.value = bankroll.starting || 0;
 
   const SPORTS = ["Basketball", "Football", "Baseball", "Soccer", "Tennis"];
   const CATEGORIES = [
@@ -61,23 +68,33 @@ document.addEventListener("DOMContentLoaded", () => {
     "Other"
   ];
 
-  const today = new Date();
-  currentYear = today.getFullYear();
-  currentMonth = today.getMonth();
-  selectedDate = formatDate(today);
-  selectedDateLabel.textContent = `Bets for ${selectedDate}`;
-
-  startingBankrollInput.value = bankroll.starting || 0;
-
+  // ===== HELPERS =====
   function formatDate(d) {
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
     const day = String(d.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
+    return `${y}-${m}-${day}`;
   }
 
   function formatDateFromParts(year, month, day) {
     return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+  }
+
+  function parseDateStr(dateStr) {
+    const [y, m, d] = dateStr.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  }
+
+  function getWeekKey(dateStr) {
+    const d = parseDateStr(dateStr);
+    const tmp = new Date(d.getTime());
+    tmp.setHours(0, 0, 0, 0);
+    const day = (tmp.getDay() + 6) % 7; // Monday-based
+    tmp.setDate(tmp.getDate() - day);
+    const year = tmp.getFullYear();
+    const oneJan = new Date(year, 0, 1);
+    const week = Math.floor(((tmp - oneJan) / 86400000 + oneJan.getDay() + 1) / 7) + 1;
+    return `${year}-W${String(week).padStart(2, "0")}`;
   }
 
   function saveBets() {
@@ -92,23 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.setItem("bankroll_v1", JSON.stringify(bankroll));
   }
 
-  function parseDateStr(dateStr) {
-    const [y, m, d] = dateStr.split("-").map(Number);
-    return new Date(y, m - 1, d);
-  }
-
-  function getWeekKey(dateStr) {
-    const d = parseDateStr(dateStr);
-    const tmp = new Date(d.getTime());
-    tmp.setHours(0, 0, 0, 0);
-    const day = (tmp.getDay() + 6) % 7;
-    tmp.setDate(tmp.getDate() - day);
-    const year = tmp.getFullYear();
-    const oneJan = new Date(year, 0, 1);
-    const week = Math.floor(((tmp - oneJan) / 86400000 + oneJan.getDay() + 1) / 7) + 1;
-    return `${year}-W${String(week).padStart(2, "0")}`;
-  }
-
+  // ===== CALENDAR =====
   function buildCalendar() {
     calendarEl.innerHTML = "";
 
@@ -172,13 +173,7 @@ document.addEventListener("DOMContentLoaded", () => {
       currentMonth = 11;
       currentYear--;
     }
-    buildCalendar();
-    renderROI();
-    renderTable();
-    renderMonthlySummary();
-    renderWeeklySummary();
-    renderStreaks();
-    renderCategoryBreakdown();
+    refreshAll();
   });
 
   nextMonthBtn.addEventListener("click", () => {
@@ -187,6 +182,10 @@ document.addEventListener("DOMContentLoaded", () => {
       currentMonth = 0;
       currentYear++;
     }
+    refreshAll();
+  });
+
+  function refreshAll() {
     buildCalendar();
     renderROI();
     renderTable();
@@ -194,24 +193,22 @@ document.addEventListener("DOMContentLoaded", () => {
     renderWeeklySummary();
     renderStreaks();
     renderCategoryBreakdown();
-  });
+    renderBankroll();
+  }
 
+  // ===== TABS =====
   tabButtons.forEach(btn => {
     btn.addEventListener("click", () => {
       tabButtons.forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
 
       const tab = btn.dataset.tab;
-      if (tab === "sports") {
-        sportsForm.style.display = "block";
-        horseForm.style.display = "none";
-      } else {
-        sportsForm.style.display = "none";
-        horseForm.style.display = "block";
-      }
+      sportsForm.style.display = tab === "sports" ? "block" : "none";
+      horseForm.style.display = tab === "horses" ? "block" : "none";
     });
   });
 
+  // ===== SPORTS FORM =====
   betType.addEventListener("change", () => {
     const isParlay = betType.value === "Parlay";
     legsSection.style.display = isParlay ? "block" : "none";
@@ -288,21 +285,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     bets.push(bet);
     saveBets();
-
-    buildCalendar();
-    renderROI();
-    renderTable();
-    renderMonthlySummary();
-    renderWeeklySummary();
-    renderStreaks();
-    renderCategoryBreakdown();
-    renderBankroll();
+    refreshAll();
 
     sportsForm.reset();
     legsContainer.innerHTML = "";
     legsSection.style.display = "none";
   });
 
+  // ===== HORSE FORM =====
   horseMode.addEventListener("change", () => {
     const isMulti = horseMode.value === "multi";
     singleRaceSection.style.display = isMulti ? "none" : "block";
@@ -336,7 +326,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const stake = parseFloat(document.getElementById("horseStake").value);
     const payout = parseFloat(document.getElementById("horsePayout").value);
-
     if (isNaN(stake) || isNaN(payout)) return;
 
     let bet;
@@ -384,27 +373,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     bets.push(bet);
     saveBets();
-
-    buildCalendar();
-    renderROI();
-    renderTable();
-    renderMonthlySummary();
-    renderWeeklySummary();
-    renderStreaks();
-    renderCategoryBreakdown();
-    renderBankroll();
+    refreshAll();
 
     horseForm.reset();
     multiRaceContainer.innerHTML = "";
   });
 
-  kindFilter.addEventListener("change", () => {
-    renderTable();
-  });
-
-  resultFilter.addEventListener("change", () => {
-    renderTable();
-  });
+  // ===== FILTERS & EXPORT =====
+  kindFilter.addEventListener("change", renderTable);
+  resultFilter.addEventListener("change", renderTable);
 
   exportCsvBtn.addEventListener("click", () => {
     if (bets.length === 0) {
@@ -470,6 +447,7 @@ document.addEventListener("DOMContentLoaded", () => {
     URL.revokeObjectURL(url);
   });
 
+  // ===== NOTES =====
   function loadNotesForDay() {
     dayNotesEl.value = notes[selectedDate] || "";
   }
@@ -479,6 +457,7 @@ document.addEventListener("DOMContentLoaded", () => {
     saveNotes();
   });
 
+  // ===== BANKROLL =====
   saveBankrollBtn.addEventListener("click", () => {
     const val = parseFloat(startingBankrollInput.value);
     bankroll.starting = isNaN(val) ? 0 : val;
@@ -502,6 +481,7 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
+  // ===== DAILY ROI =====
   function renderROI() {
     const dayBets = bets.filter(b => b.date === selectedDate);
     if (dayBets.length === 0) {
@@ -519,10 +499,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const roi = totalStake === 0 ? 0 : (totalProfit / totalStake) * 100;
     const sign = totalProfit >= 0 ? "+" : "";
+    const roiClass = totalProfit >= 0 ? "roi-green" : "roi-red";
+
     roiOutput.innerHTML =
-      `<strong>Daily ROI:</strong> ${roi.toFixed(2)}% (${sign}$${totalProfit.toFixed(2)})`;
+      `<strong>Daily ROI:</strong> <span class="${roiClass}">${roi.toFixed(2)}%</span> (${sign}$${totalProfit.toFixed(2)})`;
   }
 
+  // ===== TABLE =====
   function renderTable() {
     betTable.innerHTML = "";
 
@@ -542,64 +525,59 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    if (dayBets.length === 0) return;
+    dayBets.forEach(b => {
+      const tr = document.createElement("tr");
 
-    dayBets.forEach(bet => {
-      const profit = bet.payout - bet.stake;
+      const profit = b.payout - b.stake;
+      const sign = profit >= 0 ? "+" : "";
+      const profitClass = profit >= 0 ? "roi-green" : "roi-red";
 
       let details = "";
-      if (bet.kind === "sports") {
-        if (bet.mode === "straight") {
+      if (b.kind === "sports") {
+        if (b.mode === "straight") {
           details = "Straight bet";
         } else {
-          details = `${bet.legs?.length || 0} legs parlay`;
+          details = `${b.legs?.length || 0} legs parlay`;
         }
       } else {
-        if (bet.mode === "single") {
-          details = `${bet.track} – Race ${bet.raceNumber} – ${bet.horseName} (${bet.type})`;
+        if (b.mode === "single") {
+          details = `${b.track} – Race ${b.raceNumber} – ${b.horseName} (${b.type})`;
         } else {
-          const raceList = (bet.races || [])
+          const raceList = (b.races || [])
             .map(r => `R${r.race}: ${r.horse}`)
-            .join(" → ");
-          details = `Multi‑Race Bet (${bet.races.length} races): ${raceList}`;
+            .join(" -> ");
+          details = `Multi‑Race: ${raceList}`;
         }
       }
 
-      const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td>${bet.kind === "sports" ? "Sports" : "Horses"}</td>
+        <td>${b.kind}</td>
         <td>${details}</td>
-        <td>$${bet.stake.toFixed(2)}</td>
-        <td>$${bet.payout.toFixed(2)}</td>
-        <td style="color:${profit >= 0 ? "#22c55e" : "#f97373"};">
-          ${profit >= 0 ? "+" : ""}$${profit.toFixed(2)}
-        </td>
-        <td><button class="delete-btn" data-id="${bet.id}">✕</button></td>
+        <td>$${b.stake.toFixed(2)}</td>
+        <td>$${b.payout.toFixed(2)}</td>
+        <td class="${profitClass}">${sign}$${profit.toFixed(2)}</td>
+        <td><button class="delete-btn" data-id="${b.id}">X</button></td>
       `;
+
       betTable.appendChild(tr);
     });
 
     betTable.querySelectorAll(".delete-btn").forEach(btn => {
       btn.addEventListener("click", () => {
-        const id = Number(btn.getAttribute("data-id"));
+        const id = Number(btn.dataset.id);
         bets = bets.filter(b => b.id !== id);
         saveBets();
-        buildCalendar();
-        renderROI();
-        renderTable();
-        renderMonthlySummary();
-        renderWeeklySummary();
-        renderStreaks();
-        renderCategoryBreakdown();
-        renderBankroll();
+        refreshAll();
       });
     });
   }
 
+  // ===== MONTHLY SUMMARY =====
   function renderMonthlySummary() {
-    const monthStr = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}`;
-    const monthBets = bets.filter(b => b.date.startsWith(monthStr));
+    const monthStr = String(currentMonth + 1).padStart(2, "0");
+    const yearStr = String(currentYear);
 
+    const monthBets = bets.filter(b => b.date.startsWith(`${yearStr}-${monthStr}`));
     if (monthBets.length === 0) {
       monthlySummaryEl.textContent = "No bets this month.";
       return;
@@ -615,15 +593,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const roi = totalStake === 0 ? 0 : (totalProfit / totalStake) * 100;
     const sign = totalProfit >= 0 ? "+" : "";
+    const roiClass = totalProfit >= 0 ? "roi-green" : "roi-red";
 
     monthlySummaryEl.innerHTML = `
-      <strong>Total Bets:</strong> ${monthBets.length}<br>
-      <strong>Total Stake:</strong> $${totalStake.toFixed(2)}<br>
-      <strong>Total Profit:</strong> ${sign}$${totalProfit.toFixed(2)}<br>
-      <strong>Monthly ROI:</strong> ${roi.toFixed(2)}%
+      <strong>Bets:</strong> ${monthBets.length}<br>
+      <strong>Stake:</strong> $${totalStake.toFixed(2)}<br>
+      <strong>Profit:</strong> <span class="${roiClass}">${sign}$${totalProfit.toFixed(2)}</span><br>
+      <strong>Monthly ROI:</strong> <span class="${roiClass}">${roi.toFixed(2)}%</span>
     `;
   }
 
+  // ===== WEEKLY SUMMARY & COMPARISON =====
   function renderWeeklySummary() {
     const todayStr = formatDate(today);
     const thisWeekKey = getWeekKey(todayStr);
@@ -632,6 +612,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (weekBets.length === 0) {
       weeklySummaryEl.textContent = "No bets this week.";
+      weeklyComparisonEl.textContent = "";
       return;
     }
 
@@ -645,94 +626,141 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const roi = totalStake === 0 ? 0 : (totalProfit / totalStake) * 100;
     const sign = totalProfit >= 0 ? "+" : "";
+    const roiClass = roi >= 0 ? "roi-green" : "roi-red";
 
     weeklySummaryEl.innerHTML = `
       <strong>Bets this week:</strong> ${weekBets.length}<br>
       <strong>Stake:</strong> $${totalStake.toFixed(2)}<br>
-      <strong>Profit:</strong> ${sign}$${totalProfit.toFixed(2)}<br>
-      <strong>Weekly ROI:</strong> ${roi.toFixed(2)}%
+      <strong>Profit:</strong> <span class="${roiClass}">${sign}$${totalProfit.toFixed(2)}</span><br>
+      <strong>Weekly ROI:</strong> <span class="${roiClass}">${roi.toFixed(2)}%</span>
     `;
+
+    renderWeeklyComparison(roi);
   }
 
-  function renderStreaks() {
-    if (bets.length === 0) {
-      streakSummaryEl.textContent = "No streak data yet.";
+  function renderWeeklyComparison(thisWeekROI) {
+    const todayStr = formatDate(today);
+    const thisWeekKey = getWeekKey(todayStr);
+
+    const d = parseDateStr(todayStr);
+    d.setDate(d.getDate() - 7);
+    const lastWeekKey = getWeekKey(formatDate(d));
+
+    const lastWeekBets = bets.filter(b => getWeekKey(b.date) === lastWeekKey);
+
+    if (lastWeekBets.length === 0) {
+      weeklyComparisonEl.textContent = "No data for last week.";
       return;
     }
 
-    const dailyMap = {};
-    bets.forEach(b => {
-      if (!dailyMap[b.date]) dailyMap[b.date] = 0;
-      dailyMap[b.date] += (b.payout - b.stake);
+    let stake = 0;
+    let profit = 0;
+
+    lastWeekBets.forEach(b => {
+      stake += b.stake;
+      profit += b.payout - b.stake;
     });
 
-    const dates = Object.keys(dailyMap).sort();
-    let bestWinStreak = 0;
-    let bestLossStreak = 0;
-    let currentWinStreak = 0;
-    let currentLossStreak = 0;
+    const lastWeekROI = stake === 0 ? 0 : (profit / stake) * 100;
 
-    dates.forEach(d => {
-      const profit = dailyMap[d];
+    const diff = thisWeekROI - lastWeekROI;
+    const diffSign = diff >= 0 ? "+" : "";
+    const diffClass = diff >= 0 ? "roi-green" : "roi-red";
+
+    weeklyComparisonEl.innerHTML = `
+      <strong>This Week vs Last Week:</strong>
+      <span class="${diffClass}">${diffSign}${diff.toFixed(2)}%</span>
+    `;
+  }
+
+  // ===== STREAKS (simple version) =====
+  function renderStreaks() {
+    if (bets.length === 0) {
+      streakSummaryEl.textContent = "No bets yet.";
+      return;
+    }
+
+    const sorted = [...bets].sort((a, b) => a.date.localeCompare(b.date));
+
+    let currentStreak = 0;
+    let bestStreak = 0;
+
+    sorted.forEach(b => {
+      const profit = b.payout - b.stake;
       if (profit > 0) {
-        currentWinStreak++;
-        bestWinStreak = Math.max(bestWinStreak, currentWinStreak);
-        currentLossStreak = 0;
-      } else if (profit < 0) {
-        currentLossStreak++;
-        bestLossStreak = Math.max(bestLossStreak, currentLossStreak);
-        currentWinStreak = 0;
+        currentStreak++;
+        if (currentStreak > bestStreak) bestStreak = currentStreak;
       } else {
-        currentWinStreak = 0;
-        currentLossStreak = 0;
+        currentStreak = 0;
       }
     });
 
     streakSummaryEl.innerHTML = `
-      <strong>Best Winning Streak (days):</strong> ${bestWinStreak}<br>
-      <strong>Best Losing Streak (days):</strong> ${bestLossStreak}
+      <strong>Current Winning Streak:</strong> ${currentStreak} days<br>
+      <strong>Best Winning Streak:</strong> ${bestStreak} days
     `;
   }
 
+  // ===== CATEGORY BREAKDOWN (monthly) =====
   function renderCategoryBreakdown() {
-    const monthStr = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}`;
-    const monthBets = bets.filter(b => b.date.startsWith(monthStr));
+    const monthStr = String(currentMonth + 1).padStart(2, "0");
+    const yearStr = String(currentYear);
 
+    const monthBets = bets.filter(b => b.date.startsWith(`${yearStr}-${monthStr}`));
     if (monthBets.length === 0) {
       categoryBreakdownEl.textContent = "No bets this month.";
       return;
     }
 
-    let sportsCount = 0;
-    let horseCount = 0;
-    let parlayCount = 0;
-    let straightCount = 0;
-    let multiHorseCount = 0;
+    const map = {};
 
     monthBets.forEach(b => {
       if (b.kind === "sports") {
-        sportsCount++;
-        if (b.mode === "parlay") parlayCount++;
-        else straightCount++;
+        if (b.mode === "straight") {
+          const key = "Straight";
+          if (!map[key]) map[key] = { stake: 0, profit: 0 };
+          map[key].stake += b.stake;
+          map[key].profit += b.payout - b.stake;
+        } else {
+          (b.legs || []).forEach(leg => {
+            const key = leg.category || "Other";
+            if (!map[key]) map[key] = { stake: 0, profit: 0 };
+            map[key].stake += b.stake / (b.legs.length || 1);
+            map[key].profit += (b.payout - b.stake) / (b.legs.length || 1);
+          });
+        }
       } else {
-        horseCount++;
-        if (b.mode === "multi") multiHorseCount++;
+        const key = b.mode === "single" ? (b.type || "Horses") : "Horses – Multi";
+        if (!map[key]) map[key] = { stake: 0, profit: 0 };
+        map[key].stake += b.stake;
+        map[key].profit += b.payout - b.stake;
       }
     });
 
-    categoryBreakdownEl.innerHTML = `
-      <strong>Sports bets:</strong> ${sportsCount} (Straight: ${straightCount}, Parlays: ${parlayCount})<br>
-      <strong>Horse bets:</strong> ${horseCount} (Multi‑race: ${multiHorseCount})
-    `;
+    let html = "<table><thead><tr><th>Category</th><th>Stake</th><th>Profit</th><th>ROI</th></tr></thead><tbody>";
+
+    Object.keys(map).forEach(cat => {
+      const s = map[cat].stake;
+      const p = map[cat].profit;
+      const roi = s === 0 ? 0 : (p / s) * 100;
+      const sign = p >= 0 ? "+" : "";
+      const cls = p >= 0 ? "roi-green" : "roi-red";
+
+      html += `
+        <tr>
+          <td>${cat}</td>
+          <td>$${s.toFixed(2)}</td>
+          <td class="${cls}">${sign}$${p.toFixed(2)}</td>
+          <td class="${cls}">${roi.toFixed(2)}%</td>
+        </tr>
+      `;
+    });
+
+    html += "</tbody></table>";
+    categoryBreakdownEl.innerHTML = html;
   }
 
-  buildCalendar();
+  // ===== INIT =====
   loadNotesForDay();
-  renderROI();
-  renderTable();
-  renderMonthlySummary();
-  renderWeeklySummary();
-  renderStreaks();
-  renderCategoryBreakdown();
-  renderBankroll();
+  refreshAll();
 });
