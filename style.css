@@ -1,9 +1,9 @@
-/* GENERAL LAYOUT */
+/* ===== GLOBAL ===== */
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: #f5f5f5;
-  color: #222;
+  background: #1a1a1a; /* charcoal dark */
+  color: #e5e5e5;      /* soft white */
 }
 
 .app {
@@ -12,46 +12,74 @@ body {
   padding: 20px;
 }
 
+/* ===== HEADER (compact + seamless) ===== */
 header {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+  padding: 8px 0;
+  background: #1a1a1a;
+  border-bottom: 1px solid #2d2d2d;
 }
 
 header h1 {
   margin: 0;
-  font-size: 32px;
+  font-size: 22px;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 0.5px;
 }
 
 .month-nav {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 12px;
-  margin-top: 10px;
+  gap: 8px;
+  margin-top: 6px;
 }
 
 .month-nav button {
-  padding: 6px 12px;
-  font-size: 16px;
+  padding: 4px 10px;
+  font-size: 14px;
+  background: #2a2a2a;
+  color: #e5e5e5;
+  border: 1px solid #3a3a3a;
+  border-radius: 4px;
   cursor: pointer;
 }
 
-.layout {
-  display: grid;
-  grid-template-columns: 350px 1fr;
-  gap: 20px;
+.month-nav button:hover {
+  background: #333;
 }
 
-/* CARDS */
+/* ===== LAYOUT (restored + improved) ===== */
+.layout {
+  display: grid;
+  grid-template-columns: 420px 1fr; /* bigger left panel */
+  gap: 24px;
+}
+
+.calendar-panel {
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+/* ===== CARDS ===== */
 .card {
-  background: white;
+  background: #242424;
   padding: 15px;
   border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  border: 1px solid #333;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
   margin-bottom: 15px;
 }
 
-/* INPUTS */
+.card h3 {
+  margin-top: 0;
+  color: #ffffff;
+}
+
+/* ===== INPUTS ===== */
 .field {
   margin-bottom: 12px;
 }
@@ -66,7 +94,9 @@ input, select, textarea {
   width: 100%;
   padding: 8px;
   border-radius: 6px;
-  border: 1px solid #ccc;
+  border: 1px solid #555;
+  background: #1f1f1f;
+  color: #e5e5e5;
   font-size: 14px;
 }
 
@@ -74,7 +104,7 @@ textarea {
   resize: vertical;
 }
 
-/* BUTTONS */
+/* ===== BUTTONS ===== */
 .primary-btn {
   background: #2563eb;
   color: white;
@@ -95,7 +125,7 @@ textarea {
 }
 
 .delete-btn {
-  background: #ef4444;
+  background: #b91c1c;
   color: white;
   border: none;
   padding: 4px 8px;
@@ -104,53 +134,61 @@ textarea {
 }
 
 .delete-btn:hover {
-  background: #d93636;
+  background: #991b1b;
 }
 
-/* CALENDAR */
+/* ===== CALENDAR (bigger + restored spacing) ===== */
 .calendar {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
+  gap: 10px;
   text-align: center;
+  padding: 10px;
 }
 
 .calendar-header {
   font-weight: bold;
-  padding: 6px 0;
+  padding: 10px 0;
+  font-size: 15px;
+  color: #d0d0d0;
 }
 
 .calendar-day {
-  padding: 10px 0;
-  background: #fafafa;
-  border-radius: 6px;
+  padding: 18px 0;
+  background: #2a2a2a;
+  border-radius: 8px;
   cursor: pointer;
-  border: 1px solid #e5e5e5;
+  border: 1px solid #333;
+  color: #e5e5e5;
+  font-size: 16px;
+  transition: 0.15s ease;
 }
 
 .calendar-day:hover {
-  background: #eaeaea;
+  background: #3a3a3a;
+  transform: scale(1.03);
 }
 
 .calendar-day.selected {
   background: #2563eb;
   color: white;
   font-weight: bold;
+  transform: scale(1.05);
 }
 
 .calendar-day.has-bets {
-  border: 2px solid #999;
+  border: 2px solid #777;
 }
 
 .calendar-day.profit-day {
-  background: #d1fae5;
+  background: #1f3d2b;
 }
 
 .calendar-day.loss-day {
-  background: #fee2e2;
+  background: #3d1f1f;
 }
 
-/* TABS */
+/* ===== TABS ===== */
 .tabs {
   display: flex;
   gap: 10px;
@@ -160,10 +198,11 @@ textarea {
 .tab-btn {
   flex: 1;
   padding: 10px;
-  background: #e5e5e5;
-  border: none;
+  background: #333;
+  border: 1px solid #444;
   border-radius: 6px;
   cursor: pointer;
+  color: #e5e5e5;
 }
 
 .tab-btn.active {
@@ -171,19 +210,20 @@ textarea {
   color: white;
 }
 
-/* TABLE */
+/* ===== TABLE ===== */
 table {
   width: 100%;
   border-collapse: collapse;
+  color: #e5e5e5;
 }
 
 th, td {
   padding: 8px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #444;
   text-align: left;
 }
 
-/* ROI COLORS */
+/* ===== ROI COLORS ===== */
 .roi-green {
   color: #22c55e;
   font-weight: bold;
@@ -194,7 +234,7 @@ th, td {
   font-weight: bold;
 }
 
-/* WEEKLY SUMMARY SPACING */
+/* ===== WEEKLY SUMMARY ===== */
 #weeklySummary {
   margin-bottom: 6px;
 }
@@ -204,7 +244,7 @@ th, td {
   opacity: 0.9;
 }
 
-/* LEGS / MULTI-RACE */
+/* ===== LEGS / MULTI-RACE ===== */
 .legs-container > div,
 .multi-race-box {
   display: flex;
@@ -216,7 +256,7 @@ th, td {
   flex: 1;
 }
 
-/* RESPONSIVE */
+/* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
   .layout {
     grid-template-columns: 1fr;
