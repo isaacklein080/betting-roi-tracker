@@ -1,262 +1,303 @@
-/* ===== GLOBAL ===== */
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: #1a1a1a; /* charcoal dark */
-  color: #e5e5e5;      /* soft white */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #020617;
+  color: #f5f5f5;
 }
 
 .app {
-  max-width: 1400px;
-  margin: auto;
-  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
 }
 
-/* ===== HEADER (compact + seamless) ===== */
 header {
-  text-align: center;
-  margin-bottom: 10px;
-  padding: 8px 0;
-  background: #1a1a1a;
-  border-bottom: 1px solid #2d2d2d;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
 }
 
-header h1 {
+h1 {
   margin: 0;
-  font-size: 22px;
-  font-weight: 600;
-  color: #ffffff;
-  letter-spacing: 0.5px;
+  font-size: 24px;
 }
 
 .month-nav {
   display: flex;
-  justify-content: center;
   align-items: center;
   gap: 8px;
-  margin-top: 6px;
+}
+
+.month-nav h2 {
+  margin: 0;
+  font-size: 18px;
 }
 
 .month-nav button {
-  padding: 4px 10px;
-  font-size: 14px;
-  background: #2a2a2a;
-  color: #e5e5e5;
-  border: 1px solid #3a3a3a;
+  background: #1f2937;
+  color: #f5f5f5;
+  border: none;
+  padding: 6px 10px;
   border-radius: 4px;
   cursor: pointer;
 }
 
 .month-nav button:hover {
-  background: #333;
+  background: #374151;
 }
 
-/* ===== LAYOUT (restored + improved) ===== */
 .layout {
   display: grid;
-  grid-template-columns: 420px 1fr; /* bigger left panel */
-  gap: 24px;
+  grid-template-columns: 1.1fr 1.6fr;
+  gap: 20px;
 }
 
 .calendar-panel {
-  max-height: calc(100vh - 120px);
-  overflow-y: auto;
-  padding-right: 6px;
-}
-
-/* ===== CARDS ===== */
-.card {
-  background: #242424;
-  padding: 15px;
-  border-radius: 8px;
-  border: 1px solid #333;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
-  margin-bottom: 15px;
-}
-
-.card h3 {
-  margin-top: 0;
-  color: #ffffff;
-}
-
-/* ===== INPUTS ===== */
-.field {
-  margin-bottom: 12px;
-}
-
-.field.inline {
   display: flex;
-  justify-content: space-between;
-  gap: 10px;
+  flex-direction: column;
+  gap: 12px;
 }
 
-input, select, textarea {
-  width: 100%;
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #555;
-  background: #1f1f1f;
-  color: #e5e5e5;
-  font-size: 14px;
-}
-
-textarea {
-  resize: vertical;
-}
-
-/* ===== BUTTONS ===== */
-.primary-btn {
-  background: #2563eb;
-  color: white;
-  border: none;
-  padding: 10px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.primary-btn.small {
-  padding: 6px 10px;
-  font-size: 13px;
-}
-
-.primary-btn:hover {
-  background: #1e4fc7;
-}
-
-.delete-btn {
-  background: #b91c1c;
-  color: white;
-  border: none;
-  padding: 4px 8px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.delete-btn:hover {
-  background: #991b1b;
-}
-
-/* ===== CALENDAR (bigger + restored spacing) ===== */
 .calendar {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 10px;
-  text-align: center;
+  gap: 6px;
+}
+
+.calendar.card {
   padding: 10px;
 }
 
 .calendar-header {
-  font-weight: bold;
-  padding: 10px 0;
-  font-size: 15px;
-  color: #d0d0d0;
+  text-align: center;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #9ca3af;
 }
 
 .calendar-day {
-  padding: 18px 0;
-  background: #2a2a2a;
   border-radius: 8px;
+  padding: 10px 0;
+  text-align: center;
   cursor: pointer;
-  border: 1px solid #333;
-  color: #e5e5e5;
-  font-size: 16px;
-  transition: 0.15s ease;
+  user-select: none;
+  background: #020617;
+  border: 1px solid #1f2937;
+  font-size: 14px;
+  position: relative;
 }
 
 .calendar-day:hover {
-  background: #3a3a3a;
-  transform: scale(1.03);
+  background: #111827;
 }
 
 .calendar-day.selected {
-  background: #2563eb;
-  color: white;
-  font-weight: bold;
-  transform: scale(1.05);
+  outline: 2px solid #facc15;
 }
 
-.calendar-day.has-bets {
-  border: 2px solid #777;
+.calendar-day.has-bets::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #22c55e;
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .calendar-day.profit-day {
-  background: #1f3d2b;
+  background: #064e3b !important;
+  border-color: #10b981 !important;
+  color: #d1fae5;
 }
 
 .calendar-day.loss-day {
-  background: #3d1f1f;
+  background: #7f1d1d !important;
+  border-color: #f87171 !important;
+  color: #fee2e2;
 }
 
-/* ===== TABS ===== */
+.details-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#selectedDateLabel {
+  margin: 0;
+  font-size: 18px;
+}
+
+.card {
+  background: #111827;
+  border-radius: 10px;
+  padding: 14px 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+}
+
+.field {
+  margin-bottom: 10px;
+}
+
+.field label {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 4px;
+  color: #d1d5db;
+}
+
+.field input,
+.field select,
+textarea {
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #374151;
+  background: #020617;
+  color: #f9fafb;
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.field input:focus,
+.field select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+.inline {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.primary-btn {
+  margin-top: 6px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: none;
+  background: #22c55e;
+  color: #022c22;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primary-btn.small {
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.primary-btn:hover {
+  background: #16a34a;
+}
+
+.legs-container > div {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.legs-container select,
+.legs-container input {
+  flex: 1;
+}
+
+.roi-output {
+  font-size: 14px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+th, td {
+  padding: 6px 4px;
+  text-align: center;
+}
+
+thead {
+  border-bottom: 1px solid #374151;
+  color: #9ca3af;
+}
+
+tbody tr:nth-child(even) {
+  background: #020617;
+}
+
+.delete-btn {
+  background: transparent;
+  border: none;
+  color: #f87171;
+  cursor: pointer;
+  font-size: 16px;
+}
+
 .tabs {
   display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
+  gap: 6px;
+  margin-bottom: 6px;
 }
 
 .tab-btn {
   flex: 1;
-  padding: 10px;
-  background: #333;
-  border: 1px solid #444;
-  border-radius: 6px;
+  padding: 6px 8px;
+  border-radius: 999px;
+  border: 1px solid #374151;
+  background: #020617;
+  color: #e5e7eb;
   cursor: pointer;
-  color: #e5e5e5;
+  font-size: 13px;
 }
 
 .tab-btn.active {
   background: #2563eb;
-  color: white;
+  border-color: #60a5fa;
+  color: #f9fafb;
 }
 
-/* ===== TABLE ===== */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  color: #e5e5e5;
+.bet-form h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 15px;
 }
 
-th, td {
-  padding: 8px;
-  border-bottom: 1px solid #444;
-  text-align: left;
-}
-
-/* ===== ROI COLORS ===== */
-.roi-green {
-  color: #22c55e;
-  font-weight: bold;
-}
-
-.roi-red {
-  color: #ef4444;
-  font-weight: bold;
-}
-
-/* ===== WEEKLY SUMMARY ===== */
-#weeklySummary {
+.bankroll h3 {
+  margin-top: 0;
   margin-bottom: 6px;
 }
 
-#weeklyComparison {
+#bankrollSummary {
   font-size: 14px;
-  opacity: 0.9;
 }
 
-/* ===== LEGS / MULTI-RACE ===== */
-.legs-container > div,
 .multi-race-box {
   display: flex;
   gap: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .multi-race-box input {
   flex: 1;
 }
 
-/* ===== RESPONSIVE ===== */
+#monthlySummary,
+#weeklySummary,
+#streakSummary,
+#categoryBreakdown {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
 @media (max-width: 900px) {
   .layout {
     grid-template-columns: 1fr;

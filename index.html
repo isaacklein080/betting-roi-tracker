@@ -20,10 +20,7 @@
 
     <main class="layout">
 
-      <!-- LEFT PANEL -->
       <section class="calendar-panel">
-
-        <!-- BANKROLL -->
         <div class="bankroll card">
           <h3>Bankroll</h3>
           <div class="field inline">
@@ -36,41 +33,28 @@
           <div id="bankrollSummary"></div>
         </div>
 
-        <!-- CALENDAR -->
         <div class="calendar card" id="calendar"></div>
 
-        <!-- MONTHLY SUMMARY -->
         <section class="card">
           <h3>Monthly Summary</h3>
           <div id="monthlySummary"></div>
         </section>
 
-        <!-- WEEKLY SUMMARY (NEW) -->
         <section class="card">
-          <h3>Weekly Summary</h3>
+          <h3>Weekly Summary & Streaks</h3>
           <div id="weeklySummary"></div>
-          <div id="weeklyComparison" style="margin-top:6px;"></div>
+          <div id="streakSummary" style="margin-top:6px;"></div>
         </section>
 
-        <!-- STREAKS -->
-        <section class="card">
-          <h3>Streaks</h3>
-          <div id="streakSummary"></div>
-        </section>
-
-        <!-- CATEGORY BREAKDOWN -->
         <section class="card">
           <h3>Category Breakdown (This Month)</h3>
           <div id="categoryBreakdown"></div>
         </section>
-
       </section>
 
-      <!-- RIGHT PANEL -->
       <section class="details-panel">
         <h2 id="selectedDateLabel">Bets for today</h2>
 
-        <!-- TABS -->
         <div class="tabs">
           <button class="tab-btn active" data-tab="sports">Sports Bets</button>
           <button class="tab-btn" data-tab="horses">Horse Racing</button>
@@ -78,6 +62,7 @@
 
         <!-- SPORTS FORM -->
         <form id="sportsForm" class="card bet-form">
+
           <h3>Sports Bet</h3>
 
           <div class="field">
@@ -112,8 +97,9 @@
           <button type="submit" class="primary-btn">Add Sports Bet</button>
         </form>
 
-        <!-- HORSE FORM -->
+        <!-- HORSE RACING FORM -->
         <form id="horseForm" class="card bet-form" style="display:none;">
+
           <h3>Horse Racing Bet</h3>
 
           <div class="field">
@@ -124,12 +110,12 @@
             </select>
           </div>
 
-          <!-- SINGLE RACE -->
+          <!-- SINGLE RACE SECTION -->
           <div id="singleRaceSection">
             <div class="field inline">
               <div>
                 <label for="track">Track</label>
-                <input type="text" id="track">
+                <input type="text" id="track" placeholder="Santa Anita, Belmont, etc.">
               </div>
               <div>
                 <label for="raceNumber">Race #</label>
@@ -140,7 +126,7 @@
             <div class="field inline">
               <div>
                 <label for="horseName">Horse</label>
-                <input type="text" id="horseName">
+                <input type="text" id="horseName" placeholder="Horse name">
               </div>
               <div>
                 <label for="horseBetType">Bet Type</label>
@@ -157,7 +143,7 @@
             </div>
           </div>
 
-          <!-- MULTI RACE -->
+          <!-- MULTI RACE SECTION -->
           <div id="multiRaceSection" style="display:none;">
             <div class="field">
               <label for="numMultiRaces">Number of Races</label>
@@ -183,7 +169,6 @@
           <button type="submit" class="primary-btn">Add Horse Bet</button>
         </form>
 
-        <!-- FILTERS -->
         <section class="card">
           <h3>Filters & Export</h3>
           <div class="field inline">
@@ -208,20 +193,17 @@
           <button id="exportCsv" class="primary-btn small">Export CSV</button>
         </section>
 
-        <!-- DAILY ROI -->
         <section class="card">
           <h3>ROI for Selected Day</h3>
           <div id="roiOutput" class="roi-output">No bets yet.</div>
         </section>
 
-        <!-- NOTES -->
         <section class="card">
           <h3>Notes for Selected Day</h3>
-          <textarea id="dayNotes" rows="3"></textarea>
+          <textarea id="dayNotes" rows="3" placeholder="Thoughts, bad beats, strategy notes..."></textarea>
           <button id="saveNotes" class="primary-btn small" style="margin-top:6px;">Save Notes</button>
         </section>
 
-        <!-- BET TABLE -->
         <section class="card">
           <h3>Bets for Selected Day</h3>
           <table>
