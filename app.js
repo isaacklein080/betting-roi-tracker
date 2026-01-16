@@ -61,7 +61,6 @@ document.addEventListener("DOMContentLoaded", () => {
     "Other"
   ];
 
-  // ---------- INIT DATE ----------
   const today = new Date();
   currentYear = today.getFullYear();
   currentMonth = today.getMonth();
@@ -70,7 +69,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   startingBankrollInput.value = bankroll.starting || 0;
 
-  // ---------- HELPERS ----------
   function formatDate(d) {
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, "0");
@@ -111,7 +109,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return `${year}-W${String(week).padStart(2, "0")}`;
   }
 
-  // ---------- CALENDAR ----------
   function buildCalendar() {
     calendarEl.innerHTML = "";
 
@@ -199,7 +196,6 @@ document.addEventListener("DOMContentLoaded", () => {
     renderCategoryBreakdown();
   });
 
-  // ---------- TABS ----------
   tabButtons.forEach(btn => {
     btn.addEventListener("click", () => {
       tabButtons.forEach(b => b.classList.remove("active"));
@@ -216,7 +212,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ---------- SPORTS FORM ----------
   betType.addEventListener("change", () => {
     const isParlay = betType.value === "Parlay";
     legsSection.style.display = isParlay ? "block" : "none";
@@ -308,7 +303,6 @@ document.addEventListener("DOMContentLoaded", () => {
     legsSection.style.display = "none";
   });
 
-  // ---------- HORSE FORM ----------
   horseMode.addEventListener("change", () => {
     const isMulti = horseMode.value === "multi";
     singleRaceSection.style.display = isMulti ? "none" : "block";
@@ -404,7 +398,6 @@ document.addEventListener("DOMContentLoaded", () => {
     multiRaceContainer.innerHTML = "";
   });
 
-  // ---------- FILTERS & EXPORT ----------
   kindFilter.addEventListener("change", () => {
     renderTable();
   });
@@ -458,9 +451,9 @@ document.addEventListener("DOMContentLoaded", () => {
         b.kind,
         b.mode || "",
         b.type || "",
-        b.stake,
-        b.payout,
-        profit,
+        b.stake.toFixed(2),
+        b.payout.toFixed(2),
+        profit.toFixed(2),
         details.replace(/,/g, ";")
       ];
     });
@@ -477,7 +470,6 @@ document.addEventListener("DOMContentLoaded", () => {
     URL.revokeObjectURL(url);
   });
 
-  // ---------- NOTES ----------
   function loadNotesForDay() {
     dayNotesEl.value = notes[selectedDate] || "";
   }
@@ -487,7 +479,6 @@ document.addEventListener("DOMContentLoaded", () => {
     saveNotes();
   });
 
-  // ---------- BANKROLL ----------
   saveBankrollBtn.addEventListener("click", () => {
     const val = parseFloat(startingBankrollInput.value);
     bankroll.starting = isNaN(val) ? 0 : val;
@@ -511,7 +502,6 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
-  // ---------- RENDERERS ----------
   function renderROI() {
     const dayBets = bets.filter(b => b.date === selectedDate);
     if (dayBets.length === 0) {
@@ -736,7 +726,6 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
-  // ---------- INIT ----------
   buildCalendar();
   loadNotesForDay();
   renderROI();
