@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Betting ROI Tracker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="app">
+
+    <header>
+      <h1>Betting ROI Tracker</h1>
+      <div class="month-nav">
+        <button id="prevMonth">◀</button>
+        <h2 id="monthLabel"></h2>
+        <button id="nextMonth">▶</button>
+      </div>
+    </header>
+
+    <main class="layout">
+
+      <section class="calendar-panel">
+        <div class="bankroll card">
+          <h3>Bankroll</h3>
+          <div class="field inline">
+            <div>
+              <label for="startingBankroll">Starting Bankroll ($)</label>
+              <input type="number" id="startingBankroll" step="1" min="0">
+            </div>
+            <button id="saveBankroll" class="primary-btn small">Save</button>
+          </div>
+          <div id="bankrollSummary"></div>
+        </div>
+
+        <div class="calendar card" id="calendar"></div>
+
+        <section class="card">
+          <h3>Monthly Summary</h3>
+          <div id="monthlySummary"></div>
+        </section>
+
+        <section class="card">
+          <h3>Weekly Summary & Streaks</h3>
+          <div id="weeklySummary"></div>
+          <div id="streakSummary" style="margin-top:6px;"></div>
+        </section>
+
+        <section class="card">
+          <h3>Category Breakdown (This Month)</h3>
+          <div id="categoryBreakdown"></div>
+        </section>
+      </section>
+
+      <section class="details-panel">
+        <h2 id="selectedDateLabel">Bets for today</h2>
+
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="sports">Sports Bets</button>
+          <button class="tab-btn" data-tab="horses">Horse Racing</button>
+        </div>
+
+        <!-- SPORTS FORM -->
+        <form id="sportsForm" class="card bet-form">
+
+          <h3>Sports Bet</h3>
+
+          <div class="field">
+            <label for="betType">Bet Type</label>
+            <select id="betType">
+              <option value="Straight">Straight</option>
+              <option value="Parlay">Parlay</option>
+            </select>
+          </div>
+
+          <div id="legsSection" class="field" style="display:none;">
+            <label for="numLegs">Number of legs</label>
+            <div class="inline">
+              <input type="number" id="numLegs" min="1" max="20" value="2">
+              <button type="button" id="buildLegs">Build Legs</button>
+            </div>
+          </div>
+
+          <div id="legsContainer" class="legs-container"></div>
+
+          <div class="field inline">
+            <div>
+              <label for="stake">Total Stake ($)</label>
+              <input type="number" id="stake" step="0.5" min="0" required>
+            </div>
+            <div>
+              <label for="payout">Total Payout ($)</label>
+              <input type="number" id="payout" step="0.5" min="0" required>
+            </div>
+          </div>
+
+          <button type="submit" class="primary-btn">Add Sports Bet</button>
+        </form>
+
+        <!-- HORSE RACING FORM -->
+        <form id="horseForm" class="card bet-form" style="display:none;">
+
+          <h3>Horse Racing Bet</h3>
+
+          <div class="field">
+            <label for="horseMode">Bet Mode</label>
+            <select id="horseMode">
+              <option value="single">Single Race Bet</option>
+              <option value="multi">Multi‑Race Bet</option>
+            </select>
+          </div>
+
+          <!-- SINGLE RACE SECTION -->
+          <div id="singleRaceSection">
+            <div class="field inline">
+              <div>
+                <label for="track">Track</label>
+                <input type="text" id="track" placeholder="Santa Anita, Belmont, etc.">
+              </div>
+              <div>
+                <label for="raceNumber">Race #</label>
+                <input type="number" id="raceNumber" min="1">
+              </div>
+            </div>
+
+            <div class="field inline">
+              <div>
+                <label for="horseName">Horse</label>
+                <input type="text" id="horseName" placeholder="Horse name">
+              </div>
+              <div>
+                <label for="horseBetType">Bet Type</label>
+                <select id="horseBetType">
+                  <option value="Win">Win</option>
+                  <option value="Place">Place</option>
+                  <option value="Show">Show</option>
+                  <option value="Exacta">Exacta</option>
+                  <option value="Trifecta">Trifecta</option>
+                  <option value="Superfecta">Superfecta</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- MULTI RACE SECTION -->
+          <div id="multiRaceSection" style="display:none;">
+            <div class="field">
+              <label for="numMultiRaces">Number of Races</label>
+              <input type="number" id="numMultiRaces" min="2" max="10" value="2">
+            </div>
+
+            <button type="button" id="buildMultiRaces" class="primary-btn small">Build Races</button>
+
+            <div id="multiRaceContainer" class="legs-container"></div>
+          </div>
+
+          <div class="field inline">
+            <div>
+              <label for="horseStake">Stake ($)</label>
+              <input type="number" id="horseStake" step="0.5" min="0" required>
+            </div>
+            <div>
+              <label for="horsePayout">Payout ($)</label>
+              <input type="number" id="horsePayout" step="0.5" min="0" required>
+            </div>
+          </div>
+
+          <button type="submit" class="primary-btn">Add Horse Bet</button>
+        </form>
+
+        <section class="card">
+          <h3>Filters & Export</h3>
+          <div class="field inline">
+            <div>
+              <label for="kindFilter">Bet Type</label>
+              <select id="kindFilter">
+                <option value="all">All</option>
+                <option value="sports">Sports</option>
+                <option value="horses">Horses</option>
+              </select>
+            </div>
+            <div>
+              <label for="resultFilter">Result</label>
+              <select id="resultFilter">
+                <option value="all">All</option>
+                <option value="profit">Profitable</option>
+                <option value="loss">Losing</option>
+                <option value="even">Break-even</option>
+              </select>
+            </div>
+          </div>
+          <button id="exportCsv" class="primary-btn small">Export CSV</button>
+        </section>
+
+        <section class="card">
+          <h3>ROI for Selected Day</h3>
+          <div id="roiOutput" class="roi-output">No bets yet.</div>
+        </section>
+
+        <section class="card">
+          <h3>Notes for Selected Day</h3>
+          <textarea id="dayNotes" rows="3" placeholder="Thoughts, bad beats, strategy notes..."></textarea>
+          <button id="saveNotes" class="primary-btn small" style="margin-top:6px;">Save Notes</button>
+        </section>
+
+        <section class="card">
+          <h3>Bets for Selected Day</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Kind</th>
+                <th>Details</th>
+                <th>Stake</th>
+                <th>Payout</th>
+                <th>Profit</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="betTable"></tbody>
+          </table>
+        </section>
+
+      </section>
+
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
